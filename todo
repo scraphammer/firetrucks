@@ -1,0 +1,52 @@
+tutorials
+? Edo Basics (FiretrucksGame, A few different triggers)
+  Edo Dialogue and camera
+  Edo advanced triggers (ueas, others)
+  eDo State Machines
+  eDo MouseTriggers
+
+trashbag v1.1
+x Edo Lavender 
+? Edo (All) -- Set collision cylinders
+
+firtrucks v1.2
+x Edo Firetruck
+  edO FiretruckSwarm -- "since they're so low poly you could now do a pawn w/
+                        a stampede move"
+  eDo ClassicHUD -- FUCK this
+x Edo DialogueNode -- Fix an issue with documentation
+x eDo DialogueNode -- Maybe remove the ":" that appears in log if no speaker
+x Edo OfficeChair -- refactor to trashbag
+x Edo DialogueNode -- resets FOV in dialogues longer than one node
+                      (Check camera event too)
+  eDo FiretrucksPlayer -- "I feel like the choice selection in the DialogueNode
+                          is a slightly too sensitive"
+  eDo FiretrucksPlayer -- seperate input handlers
+  eDo FiretrucksHUD -- seperate Dialogue, combat hud, inventory hud...
+x Edo InventoryChecker -- revert to live, deprecate and replace
+x Edo InventoryChecker2 -- impl
+x Edo Identitron3000 -- player name ALSO menu name of player!
+/ edO FiretrucksPlayer -- set menu name of player
+x eDo Identitron3000 -- player config copy MAYBE use hack in firetrucksgame?
+                        possibly create data actor and spawn it, reference to
+                        newly spawned player. if reference cannot be set, use
+                        prebeginplay to match player instance to data instance
+x Edo OfficeChair -- chair deco
+  edO PlayerNameChecker -- check HUD player name hint: use eventinstigator
+
+v1.1
+
+x Edo TextEvent -- text event issue
+/ eDo ClassicHUD -- low priority
+/ Edo Firetruck -- deco mesh
+  Edo FiretrucksHUD -- shield icon for suits/belts
+/ edO Hyacinth -- clean mesh, fix uvs, texture the damn thing, maybe push back
+                  to future package. Are the UVs really that bad?
+x Edo DialogueNode -- ignore dead pawns -- done!!
+/ eDo FiretrucksHUD -- split off dialogue fns to seperate class
+/ eDo FiretrucksDialogueUI -- TODO
+/ edO ClassicDialogueUI -- very low prio
+/ eDo FiretrucksPlayer -- split input handler functions to external class
+/ eDo FiretrucksInputHandler
+/ edO UseEventAssociator -- turn usetarget to face player (parameterized)
+x eDo HUDTrigger -- needs an icon
