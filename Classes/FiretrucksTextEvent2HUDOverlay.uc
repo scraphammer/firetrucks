@@ -29,6 +29,7 @@ function add(TextEvent2 textEvent2) {
   local TextEvent2 previous, swap;
   local float previousAlpha, swapAlpha;
   local int i;
+  log("add called for"@owner@textEvent2@textEvent2.text);
   previousAlpha = 0;
   previous = textEvent2;
   for (i = 0; i < EVENT_QUEUE_SIZE; i++) {
@@ -160,7 +161,6 @@ simulated event postRender(Canvas canvas) {
           animAlphaToUse = animAlphas[i];
           break;
       }
-      //log("text"@enqueuedTextEvents[i].text@"animAlpha"@animAlphas[i]@"color R="@col.r@" G="@col.g@" B="@col.b@" with timings: "@(enqueuedTextEvents[i].fadeInTime @ enqueuedTextEvents[i].fadeOutTime @ enqueuedTextEvents[i].duration));
       drawTextWithShadow2(canvas, enqueuedTextEvents[i].text, false, false, enqueuedTextEvents[i].portrait, enqueuedTextEvents[i].getAnimation(), col, animAlphaToUse, edgeSpacing);
       j++;
     } 

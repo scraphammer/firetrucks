@@ -25,6 +25,11 @@ var() Texture Portrait; //optional portrait to display with the message
 var() class<TextEvent2HUDOverlay> TextEventStyle; // The HUD overlay class used to draw the text events
 var() bool bInstigatorOnly; // if true, it will only check the instigator.
 
+replication {
+  reliable if (Role == ROLE_Authority)
+    getAnimation;
+}
+
 enum ECheckScope {
   CS_CASCADING,
   CS_GLOBAL,
@@ -55,24 +60,46 @@ struct KvTemplatedTranslatorEventReplacement {
 var(KvStore) KvTemplatedTranslatorEventReplacement Replacements[8];
 var(KvStore) localized string TemplateString;
 
-function byte getAnimation() {
+simulated function byte getAnimation() {
   return textAnimation;
 }
 
 function Trigger(actor Other, pawn EventInstigator) {
   local PlayerPawn pp;
-  local TextEvent2HUDOverlay hudOverlay;
+  local inventory i;
+  local TextEvent2Replicator rep;
 
   if (bInstigatorOnly) {
-    if (PlayerPawn(other) == none || PlayerPawn(other).myHUD == none) return;
-    hudOverlay = TextEvent2HUDOverlay(PlayerPawn(other).myHUD.addOverlay(textEventStyle, true));
-    hudOverlay.add(self);
+    if (PlayerPawn(EventInstigator) == none) return;
+    pp = PlayerPawn(EventInstigator);
+    i = pp.inventory;
+    while (i != none) {
+      if (TextEvent2Replicator(i) != none) {
+        rep = TextEvent2Replicator(i);
+        break;
+      }
+      i = i.inventory;
+    }
+    if (rep == none) {
+      rep = spawn(class'TextEvent2Replicator');
+      rep.touch(eventInstigator);
+    }
+    rep.giveToMyOwner(self);
   } else {
     foreach allactors(class'PlayerPawn', pp) {
-      if (pp.myHUD != none) {
-        hudOverlay = TextEvent2HUDOverlay(PlayerPawn(other).myHUD.addOverlay(textEventStyle, true));
-        hudOverlay.add(self);
+      i = pp.inventory;
+      while (i != none) {
+        if (TextEvent2Replicator(i) != none) {
+          rep = TextEvent2Replicator(i);
+          break;
+        }
+        i = i.inventory;
       }
+      if (rep == none) {
+        rep = spawn(class'TextEvent2Replicator');
+        rep.touch(pp);
+      }
+      rep.giveToMyOwner(self);
     }
   }
   
@@ -87,4 +114,5 @@ defaultproperties {
   TemplateString="%s"
   TextEventStyle=Class'FiretrucksTextEvent2HUDOverlay'
   TextColor=(R=255,G=255,B=255)
+  bNoDelete=true
 }
