@@ -32,6 +32,7 @@ function Trigger(actor Other, pawn EventInstigator) {
             targetDialogueNode.enabled = !targetDialogueNode.enabled;
             break;
     }
+    if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 defaultproperties

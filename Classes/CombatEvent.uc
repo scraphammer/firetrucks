@@ -34,6 +34,7 @@ function trigger(actor Other, pawn EventInstigator) {
   }
 
   if (disableAfterUse) enabled = false;
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 defaultproperties {

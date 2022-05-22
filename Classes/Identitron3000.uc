@@ -58,6 +58,7 @@ function postBeginPlay() {
 function trigger(actor Other, pawn EventInstigator) {
   if (listenOn != TN_TRIGGER) return;
   id3kmain(targetEveryone, EventInstigator);
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 function id3kmain(bool everyone, optional Pawn ei) {

@@ -32,6 +32,7 @@ function trigger(Actor other, Pawn eventInstigator) {
   }
   
   if (forceTick) enableTick = true;
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 defaultproperties

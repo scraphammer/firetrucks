@@ -55,6 +55,7 @@ function Trigger(actor Other, pawn EventInstigator) {
             foreach allactors(class'inventory', inv) inv.destroy();
             break;
     }
+    if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 defaultproperties

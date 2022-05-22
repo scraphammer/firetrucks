@@ -32,7 +32,7 @@ function Trigger(actor Other, pawn EventInstigator) {
       foreach allactors(protoType, a) destroyerMain(a);
       break;
   }
-  triggerEvent(event, other, eventInstigator);
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 function destroyerMain(Actor a) {

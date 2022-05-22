@@ -14,8 +14,11 @@ class Firetruck expands Decoration;
 
 #exec MESHMAP SETTEXTURE MESHMAP=firetruckdeco NUM=1 TEXTURE=Jfiretruckdeco1
 
+var() const editconst string VersionString;
+
 defaultproperties
 {
+    VersionString="1.3.0_alpha1"
     DrawType=DT_Mesh
     Mesh=firetruckdeco
 }

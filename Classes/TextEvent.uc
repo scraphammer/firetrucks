@@ -1,7 +1,8 @@
 //=============================================================================
 // TextEvent.
+// Deprecated in favor of TextEvent2
 //=============================================================================
-class TextEvent extends Triggers;
+class TextEvent extends Triggers nousercreate;
 
 /**
 Displays text on screen. Useful for conveying the main character's thoughts.

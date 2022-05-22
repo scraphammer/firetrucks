@@ -1,5 +1,5 @@
 //=============================================================================
-// PawnEnslaver.
+// PawnEnslaver: A port of Qtit's PawnTrigger
 //=============================================================================
 class PawnEnslaver expands Triggers;
 
@@ -8,6 +8,7 @@ class PawnEnslaver expands Triggers;
 
 /**
 A port of Qtit's PawnTrigger from the previous Chronicles of Weedrow event, only renamed so it doesn't conflict with UPak.
+I've cleaned up some of the language from the original author's comments from 11 years ago.
 */
 
 var() ScriptedPawn Pawn; //The pawn to be manipulated.
@@ -30,7 +31,7 @@ function Trigger( actor Other, pawn EventInstigator )
          Pawn.Orders = NewOrders;
          Pawn.OrderTag = NewOrderTag;
          Pawn.AlarmTag = NewAlarmTag;
-         Pawn.Gotostate('StartUp'); //Reset the faggot, damn stupid son of a biatch doesn't want to change states, 
+         Pawn.Gotostate('StartUp'); //Reset the [actor]... doesn't want to change states, 
                                        //so we shall kill the previous state and start over.
       }
       if(NewAnimation != 'none')

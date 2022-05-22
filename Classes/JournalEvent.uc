@@ -62,6 +62,8 @@ function Trigger(actor Other, pawn EventInstigator) {
 	foreach allActors(class'PlayerPawn', pp) touch(pp);
 	if (!forceJournalOpen) return;
 	foreach allActors(class'Journal', j) if (j.owner != none) j.gotoState('Activated');
+  
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 function UnTrigger(actor Other, pawn EventInstigator) {

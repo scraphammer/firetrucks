@@ -24,6 +24,7 @@ function Trigger(actor Other, pawn EventInstigator) {
     isActive = true;
     if (duration > 0) setTimer(duration, false);
   }
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 function timer() {

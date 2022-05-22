@@ -90,6 +90,8 @@ function trigger(actor o, pawn ei) {
       targetActor.setRotation(rotator(targetOfTarget.location - targetActor.location));
       break;
   }
+
+  if (event != '') triggerEvent(event, o, ei);
 }
 
 event DrawEditorSelection(Canvas c){

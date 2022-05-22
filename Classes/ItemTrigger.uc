@@ -40,6 +40,7 @@ function string getUseName() {
 
 function Trigger(actor Other, pawn EventInstigator) {
   enabled = !enabled;
+  if (event != '') triggerEvent(event, other, eventInstigator);
 }
 
 defaultproperties
