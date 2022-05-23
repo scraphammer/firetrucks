@@ -9,12 +9,12 @@ class TextEvent2 extends Triggers;
 var() enum ETextAnimation {
   ANIM_Default,
   ANIM_Alert,
-  ANIM_Special,
+  ANIM_Wavy,
+  ANIM_WipeInFadeOut,
+  ANIM_Shaky,
 } TextAnimation;
 
-// TODO Fade vs Wiping vs Radial wipe text, parameterize font
-// bool option for wipe to make wipe fade in/out time per character instead of for whole text
-
+var() Font OverrideFont;
 var() color TextColor;
 var() localized string Text; //The text to display.
 var() localized float FadeInTime;

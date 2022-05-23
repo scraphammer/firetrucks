@@ -4,12 +4,20 @@
 //=============================================================================
 class FiretrucksTextEvent2HUDOverlay extends TextEvent2HUDOverlay;
 
+#exec Font Import File=Textures\WeedrowFontItalic.pcx Name=WeedrowFontItalic
+
+#exec texture import file=Textures\TextEventShadow_0inverted.pcx name=te_shadow1inverted group=UI mips=Off
+#exec texture import file=Textures\TextEventShadow_1inverted.pcx name=te_shadow2inverted group=UI mips=Off
+#exec texture import file=Textures\TextEventShadow_2inverted.pcx name=te_shadow3inverted group=UI mips=Off
+
+var color PURE_WHITE;
 var int EVENT_QUEUE_SIZE;
 var float animAlphas[6];
 var TextEvent2 enqueuedTextEvents[6];
 
 var float specialAnimAlpha;
 
+var() int minBrightness;
 var() float vSizeCutoff; //cutoff between full size and reduced UI
 
 var() Font smallUIFont; //font to use at unfairly small resolutions or with the HUD scale cranked
@@ -50,7 +58,7 @@ simulated function bool isValid(int index) {
   return animAlphas[index] < enqueuedTextEvents[index].fadeInTime + enqueuedTextEvents[index].fadeOutTime + enqueuedTextEvents[index].duration;
 }
 
-simulated static function drawTextWithShadow2(Canvas c, coerce string s, bool CR, bool clip, Texture icon, byte textStyle, color textColor, float animAlpha, float edgeSpacing) {
+simulated static function drawTextWithShadow2(Canvas c, coerce string s, bool CR, bool clip, Texture icon, byte textStyle, color textColor, float animAlpha, float edgeSpacing, bool darkMode, optional float fadeInTime) {
   local float xl, yl;
   local byte oldStyle;
   local color oldColor;
@@ -65,27 +73,40 @@ simulated static function drawTextWithShadow2(Canvas c, coerce string s, bool CR
   oldStyle = c.style;
   oldColor = c.drawColor;
   c.style = 4;
-  
-  c.drawrect(Texture'te_shadow1', yl / 2, yl);
-  c.drawrect(Texture'te_shadow2', max(0, xl - yl), yl);
-  c.drawrect(Texture'te_shadow3', yl / 2, yl);
+
+  if (fadeInTime == 0) fadeInTime = 1;
+
+  if (darkMode) {
+    c.drawrect(Texture'te_shadow1', yl / 2, yl);
+    c.drawrect(Texture'te_shadow2', max(0, xl - yl), yl);
+    c.drawrect(Texture'te_shadow3', yl / 2, yl);
+  } else {
+    origin.x = c.curX;
+    origin.y = c.curY;
+    c.drawrect(Texture'te_shadow1inverted', yl / 2, yl);
+    c.drawrect(Texture'te_shadow2inverted', max(0, xl - yl), yl);
+    c.drawrect(Texture'te_shadow3inverted', yl / 2, yl);
+    c.setPos(origin.x, origin.y);
+    c.drawrect(Texture'te_shadow1inverted', yl / 2, yl);
+    c.drawrect(Texture'te_shadow2inverted', max(0, xl - yl), yl);
+    c.drawrect(Texture'te_shadow3inverted', yl / 2, yl);
+  }
 
   c.style = 1;
   c.setPos(c.curX - xl, c.curY);
   if (icon != none) c.drawrect(icon, yl, yl);
-  if (textColor == makeColor(0,0,0)) textColor = makeColor(255,255,255);
   c.drawColor = textColor;
   switch (textStyle) {
-    case 1:
+    case 1: // ANIM_Alert
       origin.x = c.curX;
       origin.y = c.curY;
-      animated = jitterErp(animAlpha) * 4.5;
+      animated = jitterErp(animAlpha) * 5.5;
       c.setPos(c.curX + animated.x, c.curY + animated.y);
       if (!clip) c.drawText(s, CR);
       else c.drawTextClipped(s, CR);
       c.setPos(origin.x + XL, origin.y);
       break;
-    case 2:
+    case 2: // ANIM_Wavy
       slen = len(s);
       for (i = 0; i < slen; i++) {
         origin.x = c.curX;
@@ -99,7 +120,27 @@ simulated static function drawTextWithShadow2(Canvas c, coerce string s, bool CR
         c.setPos(origin.x + XL, origin.y);
       }
       break;
-    default: 
+    case 3: // ANIM_WipeInFadeOut
+      slen = len(s);
+      chopped = mid(s, 0, fmin(1, (animAlpha / fadeInTime)) * slen);
+      if (!clip) c.drawText(s, CR);
+      else c.drawTextClipped(s, CR);
+      break;
+    case 4: // ANIM_Shaky
+      slen = len(s);
+      for (i = 0; i < fmin(1, (animAlpha / fadeInTime)) * slen; i++) {
+        origin.x = c.curX;
+        origin.y = c.curY;
+        animated = jitterErp(0.975);
+        chopped = mid(s, i, 1);
+        c.strLen(chopped, XL, YL);
+        c.setPos(c.curX + animated.x * edgeSpacing, c.curY + animated.y * edgeSpacing);
+        if (!clip) c.drawText(chopped, CR);
+        else c.drawTextClipped(chopped, CR);
+        c.setPos(origin.x + XL, origin.y);
+      }
+      break;
+    default: // ANIM_Default and anything else not in the above
       if (!clip) c.drawText(s, CR);
       else c.drawTextClipped(s, CR);
       break;
@@ -116,8 +157,10 @@ simulated event postRender(Canvas canvas) {
   local float edgeSpacing;
   local float startVerticalOffset;
   local float animAlphaToUse;
+  local int brightness;
   local color col;
   local int i, j;
+  local bool darkMode;
 
   //set font to use
   if (canvas.clipy > vSizeCutoff) {
@@ -138,30 +181,50 @@ simulated event postRender(Canvas canvas) {
   // draw any valid events
   for (i = 0; i < EVENT_QUEUE_SIZE; i++) {
     if (isValid(i)) {
+      if (enqueuedTextEvents[i].overrideFont != none) canvas.font = enqueuedTextEvents[i].overrideFont;
+      else canvas.font = useFont;
       canvas.strLen(enqueuedTextEvents[i].text, XL, YL);
       if (enqueuedTextEvents[i].portrait != none) XL += YL;
       canvas.setPos((canvas.clipx / 2) - (XL / 2), startVerticalOffset + (textHeight + edgeSpacing) * j);
+      brightness = max(enqueuedTextEvents[i].textColor.r, max(enqueuedTextEvents[i].textColor.g, enqueuedTextEvents[i].textColor.b));
+      darkMode = brightness >= minBrightness;
       switch (enqueuedTextEvents[i].getAnimation()) {
-        case 1:
+        case 1: // ANIM_Alert
           col = enqueuedTextEvents[i].textColor;
-          if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime) animAlphaToUse = 1.0 - (animAlphas[i] / enqueuedTextEvents[i].fadeInTime);
-          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) animAlphaToUse = (animAlphas[i] - enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime;
+          if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime) animAlphaToUse = animAlphas[i] / enqueuedTextEvents[i].fadeInTime;
           else animAlphaToUse = 1;
-          break;
-        case 2:
-          if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor * (animAlphas[i] / enqueuedTextEvents[i].fadeInTime);
-          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
+          if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime && darkMode) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeInTime));
+          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor + invertColor(enqueuedTextEvents[i].textColor) * ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeInTime);
           else col = enqueuedTextEvents[i].textColor;
-          animAlphaToUse = specialAnimAlpha;
           break;
-        default:
+        case 2: // ANIM_Wavy
           if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor * (animAlphas[i] / enqueuedTextEvents[i].fadeInTime);
           else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
           else col = enqueuedTextEvents[i].textColor;
           animAlphaToUse = animAlphas[i];
           break;
+        case 3: // ANIM_WipeInFadeOut
+          if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime && darkMode) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
+          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor + invertColor(enqueuedTextEvents[i].textColor) * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
+          else col = enqueuedTextEvents[i].textColor;
+          animAlphaToUse = animAlphas[i];
+          break;
+        case 4: // ANIM_Shaky
+          if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime && darkMode) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
+          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor + invertColor(enqueuedTextEvents[i].textColor) * ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime);
+          else col = enqueuedTextEvents[i].textColor;
+          animAlphaToUse = animAlphas[i];
+          break;
+        default:
+          if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime && darkMode) col = enqueuedTextEvents[i].textColor * (animAlphas[i] / enqueuedTextEvents[i].fadeInTime);
+          else if (animAlphas[i] < enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor + invertColor(enqueuedTextEvents[i].textColor) * (1.0 - (animAlphas[i] / enqueuedTextEvents[i].fadeInTime));
+          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime && darkMode) col = enqueuedTextEvents[i].textColor * (1 - ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime));
+          else if (animAlphas[i] > enqueuedTextEvents[i].duration + enqueuedTextEvents[i].fadeInTime) col = enqueuedTextEvents[i].textColor + invertColor(enqueuedTextEvents[i].textColor) * ((animAlphas[i] - enqueuedTextEvents[i].duration - enqueuedTextEvents[i].fadeInTime) / enqueuedTextEvents[i].fadeOutTime);
+          else col = enqueuedTextEvents[i].textColor;
+          animAlphaToUse = animAlphas[i];
+          break;
       }
-      drawTextWithShadow2(canvas, enqueuedTextEvents[i].text, false, false, enqueuedTextEvents[i].portrait, enqueuedTextEvents[i].getAnimation(), col, animAlphaToUse, edgeSpacing);
+      drawTextWithShadow2(canvas, enqueuedTextEvents[i].text, false, false, enqueuedTextEvents[i].portrait, enqueuedTextEvents[i].getAnimation(), col, animAlphaToUse, edgeSpacing, darkMode, enqueuedTextEvents[i].fadeInTime);
       j++;
     } 
   }
@@ -172,4 +235,6 @@ defaultproperties {
   fullUIFont=Font'WeedrowFont'
   vSizeCutoff=800
   EVENT_QUEUE_SIZE=6
+  minBrightness=64
+  PURE_WHITE=(R=0, G=0, B=0)
 }

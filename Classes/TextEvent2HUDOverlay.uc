@@ -21,11 +21,16 @@ static final operator(20) color + (color a, color b) {
   return makeColor(max(0, min(255, a.r + b.r)), max(0, min(255, a.g + b.g)), max(0, min(255, a.b + b.b)));
 }
 
+static final function color invertColor(color c) {
+  return makeColor(255 - c.r, 255 - c.g, 255 - c.b);
+}
+
 simulated static function vector jitterErp(float alpha) {
-  local vector v;
+  /*local vector v;
   v.x = (1.0 - alpha) * sin((alpha * 32.0) ** 2);
   v.y = (1.0 - alpha) * cos((alpha * 32.0) ** 2);
-  return v;
+  return v;*/
+  return radialErp(fRand()) * (1 - alpha);
 }
 
 simulated static function vector radialErp(float alpha) {
