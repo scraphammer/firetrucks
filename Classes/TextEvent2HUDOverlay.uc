@@ -3,7 +3,7 @@
 //=============================================================================
 class TextEvent2HUDOverlay extends HUDOverlay abstract;
 
-function add(TextEvent2 textEvent2) {}
+function add(TextEvent2 textEvent2, String formatted) {}
 
 static final operator(16) color / (color c, int b) {
   return makeColor(c.r / b, c.g / b, c.b / b);

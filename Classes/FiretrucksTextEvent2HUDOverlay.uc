@@ -14,6 +14,7 @@ var color PURE_WHITE;
 var int EVENT_QUEUE_SIZE;
 var float animAlphas[6];
 var TextEvent2 enqueuedTextEvents[6];
+var string enqueuedTextCache[6];
 
 var float specialAnimAlpha;
 
@@ -33,20 +34,24 @@ simulated function tick(float delta) {
   if (specialAnimAlpha > 1.0) specialAnimAlpha -= 1.0;
 }
 
-function add(TextEvent2 textEvent2) {
+function add(TextEvent2 textEvent2, String formatted) {
   local TextEvent2 previous, swap;
   local float previousAlpha, swapAlpha;
+  local string previousText, swapText;
   local int i;
-  log("add called for"@owner@textEvent2@textEvent2.text);
   previousAlpha = 0;
   previous = textEvent2;
+  previousText = formatted;
   for (i = 0; i < EVENT_QUEUE_SIZE; i++) {
     swap = enqueuedTextEvents[i];
     swapAlpha = animAlphas[i];
+    swapText = enqueuedTextCache[i];
+    enqueuedTextCache[i] = previousText;
     enqueuedTextEvents[i] = previous;
     animAlphas[i] = previousAlpha;
     previous = swap;
     previousAlpha = swapAlpha;
+    previousText = swapText;
     if (previous == none) break;
   }
 }
@@ -183,7 +188,7 @@ simulated event postRender(Canvas canvas) {
     if (isValid(i)) {
       if (enqueuedTextEvents[i].overrideFont != none) canvas.font = enqueuedTextEvents[i].overrideFont;
       else canvas.font = useFont;
-      canvas.strLen(enqueuedTextEvents[i].text, XL, YL);
+      canvas.strLen(enqueuedTextCache[i], XL, YL);
       if (enqueuedTextEvents[i].portrait != none) XL += YL;
       canvas.setPos((canvas.clipx / 2) - (XL / 2), startVerticalOffset + (textHeight + edgeSpacing) * j);
       brightness = max(enqueuedTextEvents[i].textColor.r, max(enqueuedTextEvents[i].textColor.g, enqueuedTextEvents[i].textColor.b));
@@ -224,7 +229,7 @@ simulated event postRender(Canvas canvas) {
           animAlphaToUse = animAlphas[i];
           break;
       }
-      drawTextWithShadow2(canvas, enqueuedTextEvents[i].text, false, false, enqueuedTextEvents[i].portrait, enqueuedTextEvents[i].getAnimation(), col, animAlphaToUse, edgeSpacing, darkMode, enqueuedTextEvents[i].fadeInTime);
+      drawTextWithShadow2(canvas, enqueuedTextCache[i], false, false, enqueuedTextEvents[i].portrait, enqueuedTextEvents[i].getAnimation(), col, animAlphaToUse, edgeSpacing, darkMode, enqueuedTextEvents[i].fadeInTime);
       j++;
     } 
   }

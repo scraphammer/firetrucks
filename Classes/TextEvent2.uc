@@ -27,7 +27,7 @@ var() bool bInstigatorOnly; // if true, it will only check the instigator.
 
 replication {
   reliable if (Role == ROLE_Authority)
-    getAnimation;
+    getAnimation, getText;
 }
 
 enum ECheckScope {
@@ -59,9 +59,152 @@ struct KvTemplatedTranslatorEventReplacement {
 
 var(KvStore) KvTemplatedTranslatorEventReplacement Replacements[8];
 var(KvStore) localized string TemplateString;
+var string kvStoreClassName;
 
 simulated function byte getAnimation() {
   return textAnimation;
+}
+
+static function string fmt(string input, string replace[8], string template) {
+  local int i, j;
+  local string output;
+  i = inStr(input, template);
+  while (i != -1 && j < 8) {
+    output = output $ left(input, i) $ replace[j++];
+    input = mid(input, i + Len(template));
+		i = inStr(input, template);
+  }
+  output = output $ input;
+  return output;
+}
+
+static final function bool canCoerceBoth(coerce int a, coerce int b) {
+  return a != 0 && b != 0;
+}
+
+static final operator(24) bool cge (coerce int a, coerce int b) {
+  return a >= b;
+}
+
+static final operator(24) bool cg (coerce int a, coerce int b) {
+  return a > b;
+}
+
+static final operator(24) bool cle (coerce int a, coerce int b) {
+  return a <= b;
+}
+
+static final operator(24) bool cl (coerce int a, coerce int b) {
+  return a < b;
+}
+
+function String getText(Pawn ownerToUse) {
+  local int i;
+  local Inventory inventory;
+  local Inventory kvs;
+  local string value;
+  local Class<Inventory> kvsClass;
+  local Inventory dummy;
+  local bool needReplacement;
+  local string replacedStrings[8];
+
+  for (i = 0; i < 8; i++) {
+    if (ownerToUse != none && replacements[i].targetKey != "") needReplacement = true;
+  }
+
+  if (needReplacement) {
+    kvsClass = class<Inventory>(DynamicLoadObject(kvStoreClassName, class'Class'));
+
+    if (ownerToUse != none) {
+      inventory = ownerToUse.inventory;
+      while (inventory != none) {
+        if (inventory.class == kvsClass) {
+          kvs = inventory;
+          break;
+        }
+        inventory = inventory.inventory;
+      }
+    } 
+
+    for (i = 0; i < 8; i++) { 
+      if (kvs != none) {  
+        dummy = new (outer) class'ASMD';
+        dummy.itemName = replacements[i].targetKey;
+        dummy.bActivatable = replacements[i].bIgnoreCase;
+        switch(replacements[i].CheckScope) {
+          case CS_PERSONAL:
+            dummy.autoSwitchPriority = 0;
+            value = kvs.inventoryCapsString('', none, dummy);
+            break;
+          case CS_GLOBAL:
+            dummy.autoSwitchPriority = 1;
+            value = kvs.inventoryCapsString('', none, dummy);
+            break;
+          case CS_CASCADING:
+            dummy.autoSwitchPriority = 2;
+            value = kvs.inventoryCapsString('', none, dummy);
+            break;
+        }
+      }
+
+      switch(replacements[i].ReplacementOperation) {
+        case OP_REPLACE:
+          if (value != "") replacedStrings[i] = value;
+          else replacedStrings[i] = replacements[i].defaultReplacement;
+          break;
+        case OP_PRESENT:
+          if (value != "") replacedStrings[i] = replacements[i].replaceWith;
+          else replacedStrings[i] = replacements[i].defaultReplacement;
+          break;
+        case OP_NOT_PRESENT:
+          if (value == "") replacedStrings[i] = replacements[i].replaceWith;
+          else replacedStrings[i] = replacements[i].defaultReplacement;
+          break;
+        case OP_EQUAL:
+          if (value == replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+          else replacedStrings[i] = replacements[i].defaultReplacement;
+          break;
+        case OP_GREATER:
+          if (canCoerceBoth(value, replacements[i].targetValue)) {
+            if (value cg replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          } else {
+            if (value > replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          }
+          break;
+        case OP_GREATEREQUAL:
+          if (canCoerceBoth(value, replacements[i].targetValue)) {
+            if (value cge replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          } else {
+            if (value >= replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          }
+          break;
+        case OP_LESS:
+          if (canCoerceBoth(value, replacements[i].targetValue)) {
+            if (value cl replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          } else {
+            if (value < replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          }
+          break;
+        case OP_LESSEQUAL:
+          if (canCoerceBoth(value, replacements[i].targetValue)) {
+            if (value cle replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          } else {
+            if (value <= replacements[i].targetValue) replacedStrings[i] = replacements[i].replaceWith;
+            else replacedStrings[i] = replacements[i].defaultReplacement;
+          }
+          break;
+      }
+    }
+    return fmt(text, replacedStrings, templateString);
+  }
+  return text;
 }
 
 function Trigger(actor Other, pawn EventInstigator) {
@@ -84,7 +227,7 @@ function Trigger(actor Other, pawn EventInstigator) {
       rep = spawn(class'TextEvent2Replicator');
       rep.touch(eventInstigator);
     }
-    rep.giveToMyOwner(self);
+    rep.giveToMyOwner(self, getText(eventInstigator));
   } else {
     foreach allactors(class'PlayerPawn', pp) {
       i = pp.inventory;
@@ -99,7 +242,7 @@ function Trigger(actor Other, pawn EventInstigator) {
         rep = spawn(class'TextEvent2Replicator');
         rep.touch(pp);
       }
-      rep.giveToMyOwner(self);
+      rep.giveToMyOwner(self, getText(eventInstigator));
     }
   }
   
@@ -115,4 +258,5 @@ defaultproperties {
   TextEventStyle=Class'FiretrucksTextEvent2HUDOverlay'
   TextColor=(R=255,G=255,B=255)
   bNoDelete=true
+  kvStoreClassName="KvStore.KvStore"
 }
