@@ -9,17 +9,18 @@ class LookTrigger extends Triggers;
  A trigger that only fires its event when the player is standing within its radius and looking towards the specified actor.
  */
 
-var() bool enabled; //Whether or not this actor is enabled.
-var() Actor lookTarget; //The target actor for the player to be looking at.
-var() bool lookAway; //If true, the trigger fires when the player is looking away from the target, rather than towards the target.
+var() bool Enabled; //Whether or not this actor is enabled.
+var() Actor LookTarget; //The target actor for the player to be looking at.
+var() bool LookAway; //If true, the trigger fires when the player is looking away from the target, rather than towards the target.
 var editconst enum FlashType {
   FT_EITHER,
   FT_FLASHLIGHT,
   FT_NOFLASHLIGHT,
 } requireFlashLight; //Whether or not this actor should behave differently when player the player has a WeedrowFlashlight and it is toggled on or off.
-var() bool triggerOnceOnly; //If true, the trigger disables itself after firing once.
-var() float reTriggerDelay; //After triggering, this is the delay before it can trigger again.
-var() float precision; //The maximum (or minimum) angle in radians for the player's viewRotation to deviate from a direct line to the target in order for this actor to trigger.
+var() bool TriggerOnceOnly; //If true, the trigger disables itself after firing once.
+var() float ReTriggerDelay; //After triggering, this is the delay before it can trigger again.
+var() float Precision; //The maximum (or minimum) angle in radians for the player's viewRotation to deviate from a direct line to the target in order for this actor to trigger.
+var() editconst String PrecisionHelpText;
 
 var bool ready;
 var bool active;
@@ -38,7 +39,7 @@ function tick(Float f) {
     else b = angleBetween(lookTarget, p) < precision;
     
     if (b) {
-      triggerEvent(event, Self, Instigator);
+      triggerEvent(event, Self, p);
       if (triggerOnceOnly) enabled = false;
       if (reTriggerDelay > 0) {
         ready = false;
@@ -77,7 +78,9 @@ event Untouch(Actor other) {
 defaultproperties
 {
 				Enabled=True
+        ReTriggerDelay=1
 				precision=0.400000
 				ready=True
 				Texture=Texture'Firetrucks.Icons.i_lookTrigger'
+        PrecisionHelpText="It's the maximum angle expressed in radians between the player view rotation and the direct line between the player and the target actor."
 }

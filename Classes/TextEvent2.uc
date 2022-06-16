@@ -231,6 +231,7 @@ function Trigger(actor Other, pawn EventInstigator) {
   } else {
     foreach allactors(class'PlayerPawn', pp) {
       i = pp.inventory;
+      rep = none;
       while (i != none) {
         if (TextEvent2Replicator(i) != none) {
           rep = TextEvent2Replicator(i);

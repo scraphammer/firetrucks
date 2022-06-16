@@ -18,17 +18,21 @@ function Activate() {
   
   foreach owner.TouchingActors(class'ItemTrigger', t) {
     if (!t.enabled || t.protoType != self.class || t.event == '') continue;
-    triggerEvent(t.event, Self, Instigator);
+    if (!t.canTrigger()) return; // don't do the fail event if the item trigger isn't ready but would otherwise accept this usage
+    triggerEvent(t.event, Self, Pawn(owner));
+    t.alpha = t.reTriggerDelay;
     owner.PlaySound(ActivateSound, SLOT_Misc);
-    if (default.oneUse) {
+    if (oneUse) {
       if (numCopies > 0) numCopies--;
       else destroy();
     }
     b = true;
+    break;
   }
   
   if (!b) {
-    triggerEvent(default.eventOnUse, Owner, Instigator);
+    if (eventOnUse != '') triggerEvent(eventOnUse, Owner, Pawn(owner));
+    else triggerEvent(default.eventOnUse, Owner, Pawn(owner));
   }
 }
 

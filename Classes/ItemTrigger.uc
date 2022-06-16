@@ -32,6 +32,16 @@ var() enum UsageType {
 var() localized string useTypeCustom; //If set, ignores the <span>useType</span and instead uses this text. This is discouraged, however.
 var() localized string ItemName; //The human-readable name of the item. Not needed if <span>onScreenNotification</span>==false.
 var localized string useNames[15];
+var() float ReTriggerDelay;
+var float alpha;
+
+function bool canTrigger() {
+  return (alpha <= 0) && enabled;
+}
+
+function tick(float delta) {
+  if (alpha > 0.0) alpha -= delta;
+}
 
 function string getUseName() {
   if (useTypeCustom != "") return useTypeCustom;
@@ -45,6 +55,7 @@ function Trigger(actor Other, pawn EventInstigator) {
 
 defaultproperties
 {
+        ReTriggerDelay=1
 				Enabled=True
 				useNames(0)="Use"
 				useNames(1)="Talk"
