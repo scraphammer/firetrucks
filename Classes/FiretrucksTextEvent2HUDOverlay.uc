@@ -241,5 +241,5 @@ defaultproperties {
   vSizeCutoff=800
   EVENT_QUEUE_SIZE=6
   minBrightness=64
-  PURE_WHITE=(R=0, G=0, B=0)
+  PURE_WHITE=(R=255,G=255,B=255,A=255)
 }

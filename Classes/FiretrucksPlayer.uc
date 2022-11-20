@@ -185,10 +185,6 @@ function UseEventAssociator CheckTarget() {
   return none;
 }
 
-static final function float VSizeSq(vector A) {
-  return Square(A.X) + Square(A.Y) + Square(A.Z);
-}
-
 simulated function choices(DialogueNode dn) {
     if (dn.responses[0].optionText != "") selectedChoice = 0;
     else if (dn.responses[1].optionText != "") selectedChoice = 1;

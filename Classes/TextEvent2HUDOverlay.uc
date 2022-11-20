@@ -9,18 +9,6 @@ static final operator(16) color / (color c, int b) {
   return makeColor(c.r / b, c.g / b, c.b / b);
 }
 
-static final operator(16) color * (color c, float s) {
-  return makeColor(max(0, min(255, c.r * s)), max(0, min(255, c.g * s)), max(0, min(255, c.b * s)));
-}
-
-static final operator(20) color - (color a, color b) {
-  return makeColor(max(0, min(255, a.r - b.r)), max(0, min(255, a.g - b.g)), max(0, min(255, a.b - b.b)));
-}
-
-static final operator(20) color + (color a, color b) {
-  return makeColor(max(0, min(255, a.r + b.r)), max(0, min(255, a.g + b.g)), max(0, min(255, a.b + b.b)));
-}
-
 static final function color invertColor(color c) {
   return makeColor(255 - c.r, 255 - c.g, 255 - c.b);
 }

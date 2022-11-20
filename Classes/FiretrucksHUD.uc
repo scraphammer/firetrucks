@@ -454,10 +454,6 @@ simulated function drawStatic(Canvas c) {
   }
 }
 
-static final function float VSizeSq(vector A) {
-  return Square(A.X) + Square(A.Y) + Square(A.Z);
-}
-
 simulated function drawWeedrowInventory(Canvas c) {
   local Inventory i;
   local int iCount, charge;
