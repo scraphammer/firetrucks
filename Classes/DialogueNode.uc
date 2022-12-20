@@ -12,9 +12,6 @@ class DialogueNode extends Triggers;
 //custom font because the default one is trash and unreadable
 #exec Font Import File=Textures\WeedrowFont.pcx Name=WeedrowFont
 
-//also FYI my code style doesn't exactly match Epic's
-//but their code style sucks
-
 /**
 The actor that started this pack. When triggered, the player enters a super dialogue mode.
 */
