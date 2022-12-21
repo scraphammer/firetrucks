@@ -1,7 +1,7 @@
 //=============================================================================
 // TextEvent2Replicator: If I had a dollar... well then I'd have a dollar.
 //=============================================================================
-class TextEvent2Replicator extends Inventory;
+class TextEvent2Replicator extends Inventory nousercreate;
 
 replication {
   reliable if (Role == ROLE_Authority)

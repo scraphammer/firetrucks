@@ -1,7 +1,7 @@
 //=============================================================================
 // UseEventAssociator.
 //=============================================================================
-class UseEventAssociator extends Triggers;
+class UseEventAssociator extends Triggers nousercreate;
 
 #exec texture import file=Textures\useEvent.pcx name=i_useEvent group=Icons flags=2 mips=Off
 

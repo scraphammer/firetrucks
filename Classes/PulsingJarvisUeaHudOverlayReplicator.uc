@@ -1,0 +1,5 @@
+class PulsingJarvisUeaHudOverlayReplicator extends UseEventAssociator2HUDOverlayReplicator nousercreate transient;
+
+defaultproperties {
+  hudOverlay=Class'PulsingJarvisUEAHUDOverlay'
+}
