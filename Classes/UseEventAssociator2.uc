@@ -6,6 +6,9 @@ class UseEventAssociator2 extends Triggers;
 var() class<UseEventAssociator2HUDOverlay> HUDOverlay;
 var() bool bEnabled;
 var() bool bDisableAfterUse;
+var() vector UseOffset;
+var() Texture OptionalUseIcon;
+var() ERenderStyle UseIconRenderStyle;
 var() localized string UsePrompt;
 var() localized string UseName;
 var() color UseColor;
@@ -59,7 +62,7 @@ simulated function float getFitness(PlayerPawn playerPawn) {
   local vector v;
   local float f, angle;
   if (!bEnabled) return -1;
-  v = playerPawn.location - location;
+  v = playerPawn.location - location - UseOffset;
   f = vSize(v);
   if (f > UseDistance) return -1;
   f = f / UseDistance;
@@ -80,6 +83,8 @@ defaultproperties {
   UsePrompt="Use"
   UseName="Macguffin"
   UseDistance=128
+  OptionalUseIcon=Texture'i_use'
+  UseIconRenderStyle=STY_Translucent
   HUDOverlay=Class'PulsingJarvisUEAHUDOverlay'
   UseColor=(R=255,G=255,B=0,A=255)
   Mesh=LodMesh'UnrealShare.WoodenBoxM'

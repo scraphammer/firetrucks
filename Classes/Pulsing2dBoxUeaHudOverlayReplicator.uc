@@ -1,0 +1,5 @@
+class Pulsing2dBoxUeaHudOverlayReplicator extends UseEventAssociator2HUDOverlayReplicator nousercreate transient;
+
+defaultproperties {
+  hudOverlay=Class'Pulsing2dBoxUEAHUDOverlay'
+}

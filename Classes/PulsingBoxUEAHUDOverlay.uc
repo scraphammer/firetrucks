@@ -3,11 +3,6 @@
 //=============================================================================
 class PulsingBoxUEAHUDOverlay extends UseEventAssociator2HUDOverlay;
 
-struct Line {
-  var vector start;
-  var vector end;
-};
-
 var() float DefaultBoxSize;
 var() float AnimScalar;
 var() float vSizeCutoff; //cutoff between full size and reduced UI
@@ -102,6 +97,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   canvas.drawColor = UseEventAssociator2.UseColor;
   drawBox(canvas, UseEventAssociator2.location, width, depth, height, edgeSpacing * 2, UseEventAssociator2.rotation);
 
+  canvas.style = 1;
   canvas.font = useFont;
   canvas.drawColor = UseEventAssociator2.UseColor;
   canvas.strLen(UseEventAssociator2.UsePrompt $ ":", xl, yl);
@@ -111,6 +107,14 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   canvas.strLen(UseEventAssociator2.UseName, xl, yl);
   canvas.setPos(average.x - xl/2, average.y + edgeSpacing/2);
   Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName);
+  
+  if (UseEventAssociator2.OptionalUseIcon != none) {
+    canvas.style = UseEventAssociator2.UseIconRenderStyle;
+    canvas.setPos(average.x - UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - UseEventAssociator2.OptionalUseIcon.VClamp - yl - edgeSpacing);
+    canvas.DrawTileStretched(UseEventAssociator2.OptionalUseIcon,
+      average.x - UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - UseEventAssociator2.OptionalUseIcon.VClamp - yl - edgeSpacing,
+      average.x + UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - yl - edgeSpacing);
+  }
 }
 
 static simulated function drawBox(Canvas canvas, vector location, float radius, float length, float height, float cornerSizeUU, optional rotator rotatr) {
@@ -150,7 +154,7 @@ static simulated function drawBox(Canvas canvas, vector location, float radius, 
 defaultproperties {
   DefaultBoxSize=32;
   AnimRate=1.0;
-  AnimScalar=1;
+  AnimScalar=0.25;
   vSizeCutoff=800
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'

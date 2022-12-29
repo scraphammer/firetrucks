@@ -1,13 +1,9 @@
 //=============================================================================
-// PulsingJarvisUEAHUDOverlay: Draws a pulsing outline around the mesh
+// Pulsing2dBoxUeaHudOverlay: Draws a pulsing 2D box around the mesh
 //=============================================================================
-class PulsingJarvisUEAHUDOverlay extends UseEventAssociator2HUDOverlay;
+class Pulsing2dBoxUeaHudOverlay extends UseEventAssociator2HUDOverlay;
 
-struct Line {
-  var vector start;
-  var vector end;
-};
-
+var() float DefaultBoxSize;
 var() float AnimScalar;
 var() float vSizeCutoff; //cutoff between full size and reduced UI
 var() Font smallUIFont; //font to use at unfairly small resolutions
@@ -44,41 +40,14 @@ static final function int getVertsOfActorMesh(out array<vector> rawPoints, Actor
   return a.getVertexCount();
 }
 
-static final function bool isLeft(vector p, vector a, vector b) {
-  return ((a.y - p.y) * (b.x - a.x) - (a.x - p.x) * (b.y - a.y)) < 0;
-}
-
-static final function int jarvis(out array<vector> points, out array<Line> lines, int length) { // length = length of points
-  local int i, j;
-  local vector current, next;
-  // shamelessly borrowed from wikipedia
-
-  current = points[0];
-  for (i = 1; i < length; i++) if (points[i].x < current.x) current = points[i];
-  i = 0;
-  do {
-    lines[i].start = current;
-    next = points[0];
-    for (j = 0; j < length; j++) {
-      if (next == current || isLeft(points[j], current, next)) {
-        next = points[j];
-      }
-    }
-    lines[i].end = next;
-    current = next;
-    i++;
-  } until (next == lines[0].start);
-  return i;
-}
-
 simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local Array<vector> points;
-  local array<vector> chomped;
-  local Array<Line> lines;
-  local vector average;
+  local vector average, v;
   local float alpha;
-  local float z, xl, yl;
-  local int pointCount, lineCount, i;
+  local float width, depth;
+  local float minX, maxX, minY, maxY;
+  local float xl, yl;
+  local int pointCount, i;
 
   if (overrideAnimAlpha > 0.0 && overrideAnimAlpha <= 1.0) alpha = overrideAnimAlpha;
   else alpha = animAlpha;
@@ -92,28 +61,36 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   }
 
   if (UseEventAssociator2.mesh == none) {
-    // this needs a mesh to work
-    return;
+    // if the UEA has no mesh treat it as a (DefaultBoxSize * 2)^3 box
+    pointCount = 8;
+    width = DefaultBoxSize;
+    depth = DefaultBoxSize;
+    average = chomp(canvas.worldToScreen(UseEventAssociator2.location));
+  } else {
+    pointCount = getVertsOfActorMesh(points, UseEventAssociator2);
+  
+    // get min/max xyz for drawBox bounds, observing actor rotation too!
+    minX = canvas.clipx; minY = canvas.clipy;
+    maxX = 0; maxY = 0;
+    for (i = 0; i < pointCount; i++) {
+      v = chomp(canvas.worldToScreen(points[i]));
+      if (v.x < minX) minX = v.x;
+      if (v.y < minY) minY = v.y;
+      if (v.x > maxX) maxX = v.x;
+      if (v.y > maxY) maxY = v.y;
+    }
+    width = (maxX - minX);
+    depth = (maxY - minY);
+    average = chomp(canvas.worldToScreen(averageVector(points, pointCount)));
   }
 
-  pointCount = getVertsOfActorMesh(points, UseEventAssociator2);
 
-  for (i = 0; i < pointCount; i++) {
-    chomped[i] = chomp(canvas.worldToScreen(points[i], z));
-  }
-
-  average = averageVector(chomped, pointCount);
-
-  lineCount = jarvis(chomped, lines, pointCount);
-
-  for (i = 0; i < lineCount; i++) {
-    canvas.draw2dLine(UseEventAssociator2.UseColor / 2, lines[i].start + normal(lines[i].start - average) * animScalar * edgeSpacing * sin(2 * PI * alpha),
-      lines[i].end + normal(lines[i].end - average) * animScalar * edgeSpacing  * sin(2 * PI * alpha));
-  }
-
-  for (i = 0; i < lineCount; i++) {
-    canvas.draw2dLine(UseEventAssociator2.UseColor, lines[i].start, lines[i].end);
-  }
+  canvas.drawColor = UseEventAssociator2.UseColor / 2;
+  draw2dBox(canvas, average, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
+                                                depth + animScalar * edgeSpacing * sin(2 * PI * alpha),
+                                                edgeSpacing * 2);
+  canvas.drawColor = UseEventAssociator2.UseColor;
+  draw2dBox(canvas, average, width, depth, edgeSpacing * 2);
 
   canvas.style = 1;
   canvas.font = useFont;
@@ -133,13 +110,29 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
       average.x - UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - UseEventAssociator2.OptionalUseIcon.VClamp - yl - edgeSpacing,
       average.x + UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - yl - edgeSpacing);
   }
+  
+}
+
+static simulated function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU) {
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, -y/2, 0), center + makeVector(-x/2 + cornerSizeUU, -y/2, 0));
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, -y/2, 0), center + makeVector(-x/2, -y/2 + cornerSizeUU, 0));
+
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, y/2, 0), center + makeVector(-x/2 + cornerSizeUU, y/2, 0));
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, y/2, 0), center + makeVector(-x/2, y/2 - cornerSizeUU, 0));
+
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, -y/2, 0), center + makeVector(x/2 - cornerSizeUU, -y/2, 0));
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, -y/2, 0), center + makeVector(x/2, -y/2 + cornerSizeUU, 0));
+
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, y/2, 0), center + makeVector(x/2 - cornerSizeUU, y/2, 0));
+  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, y/2, 0), center + makeVector(x/2, y/2 - cornerSizeUU, 0));
 }
 
 defaultproperties {
+  DefaultBoxSize=32;
   AnimRate=1.0;
-  AnimScalar=2;
+  AnimScalar=1;
   vSizeCutoff=800
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'
-  ReplicatorClass=Class'PulsingJarvisUeaHudOverlayReplicator'
+  ReplicatorClass=Class'Pulsing2dBoxUeaHudOverlayReplicator'
 }
