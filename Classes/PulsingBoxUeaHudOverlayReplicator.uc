@@ -1,4 +1,4 @@
-class PulsingBoxUeaHudOverlayReplicator extends UseEventAssociator2HUDOverlayReplicator nousercreate transient;
+class PulsingBoxUeaHudOverlayReplicator extends UseEventAssociator2HUDOverlayReplicator nousercreate;
 
 defaultproperties {
   hudOverlay=Class'PulsingBoxUEAHUDOverlay'

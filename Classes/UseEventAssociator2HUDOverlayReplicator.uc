@@ -1,7 +1,7 @@
 //=============================================================================
 // UseEventAssociator2HUDOverlayReplicator: Every 60 seconds, one minute passes.
 //=============================================================================
-class UseEventAssociator2HUDOverlayReplicator extends Inventory abstract transient;
+class UseEventAssociator2HUDOverlayReplicator extends Inventory abstract;
 
 replication {
   reliable if (Role == ROLE_Authority)
