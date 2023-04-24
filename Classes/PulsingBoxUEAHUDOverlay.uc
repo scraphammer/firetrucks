@@ -60,21 +60,21 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     edgeSpacing = 2;
   }
 
-  if (UseEventAssociator2.mesh == none) {
+  if (UseEventAssociator2.getTarget().mesh == none) {
     // if the UEA has no mesh treat it as a (DefaultBoxSize * 2)^3 box
     pointCount = 8;
     width = DefaultBoxSize;
     depth = DefaultBoxSize;
     height = DefaultBoxSize;
-    average = chomp(canvas.worldToScreen(UseEventAssociator2.location));
+    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
   } else {
-    pointCount = getVertsOfActorMesh(points, UseEventAssociator2);
+    pointCount = getVertsOfActorMesh(points, UseEventAssociator2.getTarget());
   
     // get min/max xyz for drawBox bounds, observing actor rotation too!
     minX = 3e38; minY = 3e38; minZ = 3e38;
     maxX = -3e38; maxY = -3e38; maxZ = -3e38;
     for (i = 0; i < pointCount; i++) {
-      v = (points[i] - UseEventAssociator2.location) << UseEventAssociator2.rotation;
+      v = (points[i] - UseEventAssociator2.getTarget().location) << UseEventAssociator2.getTarget().rotation;
       if (v.x < minX) minX = v.x;
       if (v.y < minY) minY = v.y;
       if (v.z < minZ) minZ = v.z;
@@ -90,23 +90,23 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
 
 
   canvas.drawColor = UseEventAssociator2.UseColor / 2;
-  drawBox(canvas, UseEventAssociator2.location, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
-                                                depth + animScalar * edgeSpacing * sin(2 * PI * alpha),
-                                                height + animScalar * edgeSpacing * sin(2 * PI * alpha),
-                                                edgeSpacing * 2, UseEventAssociator2.rotation);
+  drawBox(canvas, UseEventAssociator2.getTarget().location, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
+                                                            depth + animScalar * edgeSpacing * sin(2 * PI * alpha),
+                                                            height + animScalar * edgeSpacing * sin(2 * PI * alpha),
+                                                            edgeSpacing * 2, UseEventAssociator2.getTarget().rotation);
   canvas.drawColor = UseEventAssociator2.UseColor;
-  drawBox(canvas, UseEventAssociator2.location, width, depth, height, edgeSpacing * 2, UseEventAssociator2.rotation);
+  drawBox(canvas, UseEventAssociator2.getTarget().location, width, depth, height, edgeSpacing * 2, UseEventAssociator2.getTarget().rotation);
 
   canvas.style = 1;
   canvas.font = useFont;
   canvas.drawColor = UseEventAssociator2.UseColor;
   canvas.strLen(UseEventAssociator2.UsePrompt $ ":", xl, yl);
   canvas.setPos(average.x - xl/2, average.y - yl - edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":");
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":",, true);
   canvas.drawColor = makeColor(255,255,255);
   canvas.strLen(UseEventAssociator2.UseName, xl, yl);
   canvas.setPos(average.x - xl/2, average.y + edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName);
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName,, true);
   
   if (UseEventAssociator2.OptionalUseIcon != none) {
     canvas.style = UseEventAssociator2.UseIconRenderStyle;

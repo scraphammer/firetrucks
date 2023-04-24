@@ -13,13 +13,14 @@ var() localized string UsePrompt;
 var() localized string UseName;
 var() color UseColor;
 var() float UseDistance;
+var() Actor OptionalTarget;
 
 var transient UseEventAssociator2HUDOverlay hudOverlayInstance; // used by editor select render
 var transient UseEventAssociator2ScriptHook scriptHook;
 
 replication {
   reliable if (Role == ROLE_Authority)
-    getFitness, angleBetween, getBestFit;
+    getFitness, angleBetween, getBestFit, getTarget;
 }
 
 
@@ -34,9 +35,15 @@ function tick(float delta) {
   scriptHook.initialize();
 }
 
+simulated function Actor getTarget() {
+  if (OptionalTarget.bDeleteMe) OptionalTarget = none;
+  if (OptionalTarget != none) return OptionalTarget;
+  else return self;
+}
+
 simulated function float angleBetween(PlayerPawn p) {
   local vector v, d;
-  d = location - p.location;
+  d = getTarget().location - p.location;
   v = vector(p.viewRotation);
   return acos((d dot v) / (vSize(d) * vSize(v)));
 }
@@ -62,7 +69,7 @@ simulated function float getFitness(PlayerPawn playerPawn) {
   local vector v;
   local float f, angle;
   if (!bEnabled) return -1;
-  v = playerPawn.location - location - UseOffset;
+  v = playerPawn.location - getTarget().location - UseOffset;
   f = vSize(v);
   if (f > UseDistance) return -1;
   f = f / UseDistance;

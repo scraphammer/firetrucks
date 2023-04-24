@@ -167,6 +167,8 @@ simulated event postRender(Canvas canvas) {
   local int i, j;
   local bool darkMode;
 
+  canvas.pushCanvasScale(class'HUD'.default.HudScaler);
+
   //set font to use
   if (canvas.clipy > vSizeCutoff) {
     useFont = fullUIFont;
@@ -233,6 +235,8 @@ simulated event postRender(Canvas canvas) {
       j++;
     } 
   }
+
+  canvas.popCanvasScale();
 }
 
 defaultproperties {

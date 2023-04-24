@@ -26,7 +26,9 @@ simulated event postRender(Canvas canvas) {
   useEventAssociator2 = Class'UseEventAssociator2'.static.getBestFit(PlayerPawn(owner));
 
   if (useEventAssociator2 != none && useEventAssociator2.HUDOverlay == self.class) {
+    canvas.pushCanvasScale(class'HUD'.default.HudScaler);
     drawUeaOverlay(canvas, useEventAssociator2);
+    canvas.popCanvasScale();
   }
 }
 

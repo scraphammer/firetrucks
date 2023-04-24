@@ -27,18 +27,18 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     edgeSpacing = 2;
   }
 
-  average = chomp(canvas.worldToScreen(UseEventAssociator2.location));
+  average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
 
   canvas.style = 1;
   canvas.font = useFont;
   canvas.drawColor = UseEventAssociator2.UseColor;
   canvas.strLen(UseEventAssociator2.UsePrompt $ ":", xl, yl);
   canvas.setPos(average.x - xl/2, average.y - yl - edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":");
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":",, true);
   canvas.drawColor = makeColor(255,255,255);
   canvas.strLen(UseEventAssociator2.UseName, xl, yl);
   canvas.setPos(average.x - xl/2, average.y + edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName);
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName,, true);
   
   if (UseEventAssociator2.OptionalUseIcon != none) {
     canvas.style = UseEventAssociator2.UseIconRenderStyle;

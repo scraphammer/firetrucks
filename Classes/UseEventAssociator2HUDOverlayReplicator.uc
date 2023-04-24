@@ -5,7 +5,7 @@ class UseEventAssociator2HUDOverlayReplicator extends Inventory abstract;
 
 replication {
   reliable if (Role == ROLE_Authority)
-    giveToMyOwner;
+    giveToMyOwner, initialized;
 }
 
 var() Class<UseEventAssociator2HUDOverlay> hudOverlay;
@@ -20,6 +20,11 @@ function tick(float delta) {
   if (!initialized && giveToMyOwner()) initialized = true;
 }
 
+simulated event RenderOverlays(Canvas canvas) {
+  if (!initialized && giveToMyOwner()) initialized = true;
+  super.RenderOverlays(canvas);
+}
+
 simulated function bool giveToMyOwner() {
   if (PlayerPawn(owner) == none) return true;
   if (owner != none && PlayerPawn(owner).myHUD != none) {
@@ -29,7 +34,7 @@ simulated function bool giveToMyOwner() {
 }
 
 defaultproperties {
-  bAlwaysRelevant=true
+  //bAlwaysRelevant=true
   bDisplayableInv=false
 	PickupMessage=""
 }

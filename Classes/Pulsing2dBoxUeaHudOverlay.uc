@@ -60,14 +60,14 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     edgeSpacing = 2;
   }
 
-  if (UseEventAssociator2.mesh == none) {
+  if (UseEventAssociator2.getTarget().mesh == none) {
     // if the UEA has no mesh treat it as a (DefaultBoxSize * 2)^3 box
     pointCount = 8;
     width = DefaultBoxSize;
     depth = DefaultBoxSize;
-    average = chomp(canvas.worldToScreen(UseEventAssociator2.location));
+    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
   } else {
-    pointCount = getVertsOfActorMesh(points, UseEventAssociator2);
+    pointCount = getVertsOfActorMesh(points, UseEventAssociator2.getTarget());
   
     // get min/max xyz for drawBox bounds, observing actor rotation too!
     minX = canvas.clipx; minY = canvas.clipy;
@@ -97,11 +97,11 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   canvas.drawColor = UseEventAssociator2.UseColor;
   canvas.strLen(UseEventAssociator2.UsePrompt $ ":", xl, yl);
   canvas.setPos(average.x - xl/2, average.y - yl - edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":");
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UsePrompt $ ":",, true);
   canvas.drawColor = makeColor(255,255,255);
   canvas.strLen(UseEventAssociator2.UseName, xl, yl);
   canvas.setPos(average.x - xl/2, average.y + edgeSpacing/2);
-  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName);
+  Class'FiretrucksHUD'.static.drawTextWithShadow(canvas, UseEventAssociator2.UseName,, true);
   
   if (UseEventAssociator2.OptionalUseIcon != none) {
     canvas.style = UseEventAssociator2.UseIconRenderStyle;

@@ -16,6 +16,7 @@ var() enum ETextAnimation {
 
 var() Font OverrideFont;
 var() color TextColor;
+var() localized string SpeakerName; //Not all overlay types use this field
 var() localized string Text; //The text to display.
 var() localized float FadeInTime;
 var() localized float FadeOutTime;
