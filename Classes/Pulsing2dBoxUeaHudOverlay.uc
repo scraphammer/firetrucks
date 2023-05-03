@@ -110,7 +110,6 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
       average.x - UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - UseEventAssociator2.OptionalUseIcon.VClamp - yl - edgeSpacing,
       average.x + UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - yl - edgeSpacing);
   }
-  
 }
 
 static simulated function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU) {
@@ -131,7 +130,7 @@ defaultproperties {
   DefaultBoxSize=32;
   AnimRate=1.0;
   AnimScalar=1;
-  vSizeCutoff=800
+  vSizeCutoff=650
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'
   ReplicatorClass=Class'Pulsing2dBoxUeaHudOverlayReplicator'

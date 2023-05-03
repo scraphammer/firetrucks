@@ -155,7 +155,7 @@ defaultproperties {
   DefaultBoxSize=32;
   AnimRate=1.0;
   AnimScalar=0.25;
-  vSizeCutoff=800
+  vSizeCutoff=650
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'
   ReplicatorClass=Class'PulsingBoxUeaHudOverlayReplicator'

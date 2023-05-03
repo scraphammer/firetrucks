@@ -242,7 +242,7 @@ simulated event postRender(Canvas canvas) {
 defaultproperties {
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'
-  vSizeCutoff=800
+  vSizeCutoff=650
   EVENT_QUEUE_SIZE=6
   minBrightness=64
   PURE_WHITE=(R=255,G=255,B=255,A=255)

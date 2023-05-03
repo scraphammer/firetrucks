@@ -47,11 +47,10 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
       average.x - UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - UseEventAssociator2.OptionalUseIcon.VClamp - yl - edgeSpacing,
       average.x + UseEventAssociator2.OptionalUseIcon.UClamp/2, average.y - yl - edgeSpacing);
   }
-  
 }
 
 defaultproperties {
-  vSizeCutoff=800
+  vSizeCutoff=650
   smallUIFont=Font'WeedrowSmallFont'
   fullUIFont=Font'WeedrowFont'
   ReplicatorClass=Class'PlainUeaHudOverlayReplicator'
