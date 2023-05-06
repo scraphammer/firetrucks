@@ -6,20 +6,14 @@ function initialize() {
 }
 
 function bool _tick(UseEventAssociator2 uea2, float delta) {
-  local PlayerPawn playerPawn;
-  local Inventory inventory;
-  foreach uea2.allActors(Class'PlayerPawn', playerPawn) {
-    inventory = playerPawn.inventory;
-    while (inventory != none) {
-      if (inventory.class == uea2.HUDOverlay.default.ReplicatorClass) break;
-      inventory = inventory.inventory;
-    }
-    if (inventory == none) {
-      inventory = playerPawn.spawn(uea2.HUDOverlay.default.ReplicatorClass, playerPawn);
-      inventory.touch(playerPawn);
-    }
+
+  if (uea2.dummy == none) {
+    uea2.dummy = uea2.spawn(class'UseEventAssociatorTargetDummy', uea2,,uea2.getTarget().location + uea2.UseOffset);
+    uea2.dummy.setCollisionSize(uea2.UseDistance, uea2.UseDistance, true);
+    uea2.dummy.uea2 = uea2;
   }
-  return true;
+
+  return true; 
 }
 
 function bool _grab(PlayerPawn W) {

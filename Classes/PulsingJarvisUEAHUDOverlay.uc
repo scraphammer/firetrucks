@@ -71,7 +71,7 @@ static final function int jarvis(out array<vector> points, out array<Line> lines
   return i;
 }
 
-simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
+simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local Array<vector> points;
   local array<vector> chomped;
   local Array<Line> lines;
@@ -79,6 +79,12 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   local float alpha;
   local float z, xl, yl;
   local int pointCount, lineCount, i;
+  local float hudScale2d;
+
+   if (int(level.engineVersion) >= 227 && int(level.EngineSubVersion) > 10) {
+    // 2d drawing functions are fixed in 227k so we don't need to scale them up
+    hudScale2d = 1;
+  } else hudScale2d = hudScale;
 
   if (overrideAnimAlpha > 0.0 && overrideAnimAlpha <= 1.0) alpha = overrideAnimAlpha;
   else alpha = animAlpha;
@@ -99,7 +105,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   pointCount = getVertsOfActorMesh(points, UseEventAssociator2.getTarget());
 
   for (i = 0; i < pointCount; i++) {
-    chomped[i] = chomp(canvas.worldToScreen(points[i], z));
+    chomped[i] = chomp(canvas.worldToScreen(points[i] + UseEventAssociator2.UseOffset, z));
   }
 
   average = averageVector(chomped, pointCount);
@@ -107,12 +113,12 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   lineCount = jarvis(chomped, lines, pointCount);
 
   for (i = 0; i < lineCount; i++) {
-    canvas.draw2dLine(UseEventAssociator2.UseColor / 2, lines[i].start + normal(lines[i].start - average) * animScalar * edgeSpacing * sin(2 * PI * alpha),
-      lines[i].end + normal(lines[i].end - average) * animScalar * edgeSpacing  * sin(2 * PI * alpha));
+    canvas.draw2dLine(UseEventAssociator2.UseColor / 2, (lines[i].start + normal(lines[i].start - average) * animScalar * edgeSpacing * sin(2 * PI * alpha)) * hudScale2d * hudScale2d,
+      (lines[i].end + normal(lines[i].end - average) * animScalar * edgeSpacing  * sin(2 * PI * alpha)) * hudScale2d * hudScale2d);
   }
 
   for (i = 0; i < lineCount; i++) {
-    canvas.draw2dLine(UseEventAssociator2.UseColor, lines[i].start, lines[i].end);
+    canvas.draw2dLine(UseEventAssociator2.UseColor, lines[i].start * hudScale2d * hudScale2d, lines[i].end * hudScale2d * hudScale2d);
   }
 
   canvas.style = 1;

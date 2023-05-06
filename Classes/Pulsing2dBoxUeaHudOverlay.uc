@@ -40,7 +40,7 @@ static final function int getVertsOfActorMesh(out array<vector> rawPoints, Actor
   return a.getVertexCount();
 }
 
-simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
+simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local Array<vector> points;
   local vector average, v;
   local float alpha;
@@ -48,6 +48,12 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   local float minX, maxX, minY, maxY;
   local float xl, yl;
   local int pointCount, i;
+  local float hudScale2d;
+
+   if (int(level.engineVersion) >= 227 && int(level.EngineSubVersion) > 10) {
+    // 2d drawing functions are fixed in 227k so we don't need to scale them up
+    hudScale2d = 1;
+  } else hudScale2d = hudScale;
 
   if (overrideAnimAlpha > 0.0 && overrideAnimAlpha <= 1.0) alpha = overrideAnimAlpha;
   else alpha = animAlpha;
@@ -65,7 +71,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     pointCount = 8;
     width = DefaultBoxSize;
     depth = DefaultBoxSize;
-    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
+    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location + UseEventAssociator2.UseOffset));
   } else {
     pointCount = getVertsOfActorMesh(points, UseEventAssociator2.getTarget());
   
@@ -81,16 +87,16 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     }
     width = (maxX - minX);
     depth = (maxY - minY);
-    average = chomp(canvas.worldToScreen(averageVector(points, pointCount)));
+    average = chomp(canvas.worldToScreen(averageVector(points, pointCount) + UseEventAssociator2.UseOffset));
   }
 
 
   canvas.drawColor = UseEventAssociator2.UseColor / 2;
   draw2dBox(canvas, average, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
                                                 depth + animScalar * edgeSpacing * sin(2 * PI * alpha),
-                                                edgeSpacing * 2);
+                                                edgeSpacing * 2, hudScale2d);
   canvas.drawColor = UseEventAssociator2.UseColor;
-  draw2dBox(canvas, average, width, depth, edgeSpacing * 2);
+  draw2dBox(canvas, average, width, depth, edgeSpacing * 2, hudScale2d);
 
   canvas.style = 1;
   canvas.font = useFont;
@@ -112,18 +118,18 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
   }
 }
 
-static simulated function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU) {
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, -y/2, 0), center + makeVector(-x/2 + cornerSizeUU, -y/2, 0));
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, -y/2, 0), center + makeVector(-x/2, -y/2 + cornerSizeUU, 0));
+static simulated function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU, float hudScale2d) {
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2 + cornerSizeUU, -y/2, 0)) * hudScale2d * hudScale2d);
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2, -y/2 + cornerSizeUU, 0)) * hudScale2d * hudScale2d);
 
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, y/2, 0), center + makeVector(-x/2 + cornerSizeUU, y/2, 0));
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(-x/2, y/2, 0), center + makeVector(-x/2, y/2 - cornerSizeUU, 0));
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2 + cornerSizeUU, y/2, 0)) * hudScale2d * hudScale2d);
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2, y/2 - cornerSizeUU, 0)) * hudScale2d * hudScale2d);
 
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, -y/2, 0), center + makeVector(x/2 - cornerSizeUU, -y/2, 0));
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, -y/2, 0), center + makeVector(x/2, -y/2 + cornerSizeUU, 0));
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(x/2 - cornerSizeUU, -y/2, 0)) * hudScale2d * hudScale2d);
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(x/2, -y/2 + cornerSizeUU, 0)) * hudScale2d * hudScale2d);
 
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, y/2, 0), center + makeVector(x/2 - cornerSizeUU, y/2, 0));
-  canvas.draw2DLine(canvas.drawColor, center + makeVector(x/2, y/2, 0), center + makeVector(x/2, y/2 - cornerSizeUU, 0));
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(x/2, y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(x/2 - cornerSizeUU, y/2, 0)) * hudScale2d * hudScale2d);
+  canvas.draw2DLine(canvas.drawColor, (center + makeVector(x/2, y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(x/2, y/2 - cornerSizeUU, 0)) * hudScale2d * hudScale2d);
 }
 
 defaultproperties {

@@ -19,7 +19,6 @@ simulated function giveToMyOwner(TextEvent2 textEvent2, String formatted) {
 }
 
 defaultproperties {
-  bAlwaysRelevant=true
   bDisplayableInv=false
 	PickupMessage=""
 }

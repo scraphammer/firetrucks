@@ -40,7 +40,7 @@ static final function int getVertsOfActorMesh(out array<vector> rawPoints, Actor
   return a.getVertexCount();
 }
 
-simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
+simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local Array<vector> points;
   local vector average, v;
   local float alpha;
@@ -66,7 +66,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     width = DefaultBoxSize;
     depth = DefaultBoxSize;
     height = DefaultBoxSize;
-    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
+    average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location + UseEventAssociator2.UseOffset));
   } else {
     pointCount = getVertsOfActorMesh(points, UseEventAssociator2.getTarget());
   
@@ -85,7 +85,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     width = (maxX - minX) / 2;
     depth = (maxY - minY) / 2;
     height = (maxZ - minZ) / 2;
-    average = chomp(canvas.worldToScreen(averageVector(points, pointCount)));
+    average = chomp(canvas.worldToScreen(averageVector(points, pointCount) + UseEventAssociator2.UseOffset));
   }
 
 

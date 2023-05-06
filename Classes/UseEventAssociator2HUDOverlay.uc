@@ -20,19 +20,20 @@ static final operator(16) color / (color c, int b) {
 
 simulated event postRender(Canvas canvas) {
   local UseEventAssociator2 useEventAssociator2;
+  local float clipyBeforeScale;
 
   if (PlayerPawn(owner) == none) return;
 
   useEventAssociator2 = Class'UseEventAssociator2'.static.getBestFit(PlayerPawn(owner));
 
   if (useEventAssociator2 != none && useEventAssociator2.HUDOverlay == self.class) {
-    // TODO calculate effective hud scale and pass to drawUeaOverlay()
+    clipyBeforeScale = canvas.clipy;
     canvas.pushCanvasScale(class'HUD'.default.HudScaler);
-    drawUeaOverlay(canvas, useEventAssociator2);
+    drawUeaOverlay(canvas,  clipyBeforeScale / canvas.clipy, useEventAssociator2);
     canvas.popCanvasScale();
   }
 }
 
-simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
+simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   //subclasses to implement
 }

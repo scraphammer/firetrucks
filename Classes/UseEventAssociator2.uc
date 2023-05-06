@@ -17,6 +17,7 @@ var() Actor OptionalTarget;
 
 var transient UseEventAssociator2HUDOverlay hudOverlayInstance; // used by editor select render
 var transient UseEventAssociator2ScriptHook scriptHook;
+var UseEventAssociatorTargetDummy dummy;
 
 replication {
   reliable if (Role == ROLE_Authority)
@@ -81,10 +82,11 @@ simulated function float getFitness(PlayerPawn playerPawn) {
 event DrawEditorSelection(Canvas c) {
   if (hudOverlayInstance != none && hudOverlayInstance.class != HUDOverlay) hudOverlayInstance = none;
   if (hudOverlayInstance == none) hudOverlayInstance = new (self, '', RF_Transient) HUDOverlay;
-  hudOverlayInstance.drawUeaOverlay(c, self, fRand());
+  hudOverlayInstance.drawUeaOverlay(c, 1.0, self, fRand());
 }
 
 defaultproperties {
+  bCollideActors=true
   bEnabled=true
   bDisableAfterUse=false
   UsePrompt="Use"

@@ -15,7 +15,7 @@ static final function vector chomp(vector a) {
   return makeVector(int(a.x), int(a.y), 16);
 }
 
-simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
+simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local vector average;
   local float xl, yl;
 
@@ -27,7 +27,7 @@ simulated event drawUeaOverlay(Canvas canvas, UseEventAssociator2 UseEventAssoci
     edgeSpacing = 2;
   }
 
-  average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location));
+  average = chomp(canvas.worldToScreen(UseEventAssociator2.getTarget().location + UseEventAssociator2.UseOffset));
 
   canvas.style = 1;
   canvas.font = useFont;
