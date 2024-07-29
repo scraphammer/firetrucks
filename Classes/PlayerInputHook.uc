@@ -1,0 +1,1 @@
+class PlayerInputHook extends Object nousercreate;

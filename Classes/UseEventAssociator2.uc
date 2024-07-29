@@ -13,7 +13,12 @@ var() localized string UsePrompt;
 var() localized string UseName;
 var() color UseColor;
 var() float UseDistance;
+var() float UseMinDistance;
 var() Actor OptionalTarget;
+
+var() bool bUseBox;
+var() vector UseBoxOffset;
+var() vector UseBoxDimensions;
 
 var transient UseEventAssociator2HUDOverlay hudOverlayInstance; // used by editor select render
 var transient UseEventAssociator2ScriptHook scriptHook;
@@ -66,14 +71,31 @@ static function UseEventAssociator2 getBestFit(PlayerPawn playerPawn) {
   else return none;
 }
 
+simulated static function bool isPointInsideBox(vector point, vector boxCenter, vector boxDimensions) {
+  if (point.x > boxCenter.x + boxDimensions.x / 2) return false;
+  if (point.x < boxCenter.x - boxDimensions.x / 2) return false;
+  if (point.y > boxCenter.y + boxDimensions.y / 2) return false;
+  if (point.y < boxCenter.y - boxDimensions.y / 2) return false;
+  if (point.z > boxCenter.z + boxDimensions.z / 2) return false;
+  if (point.z < boxCenter.z - boxDimensions.z / 2) return false;
+  return true;
+}
+
 simulated function float getFitness(PlayerPawn playerPawn) {
   local vector v;
   local float f, angle;
   if (!bEnabled) return -1;
-  v = playerPawn.location - getTarget().location - UseOffset;
-  f = vSize(v);
-  if (f > UseDistance) return -1;
-  f = f / UseDistance;
+  if (bUseBox) {
+    v = playerPawn.location - getTarget().location - UseOffset - UseBoxOffset;
+    f = vSize(v);
+    if (!isPointInsideBox(playerPawn.location, getTarget().location + UseOffset + UseBoxOffset, UseBoxDimensions)) return -1;
+  } else {
+    v = playerPawn.location - getTarget().location - UseOffset;
+    f = vSize(v);
+    if (f > UseDistance) return -1;
+    if (f < UseMinDistance) return -1;
+    f = f / UseDistance;
+  }
   angle = angleBetween(playerPawn);
   if (angle > PI/2) return -1;
   return f * (PI/2 - angle);
@@ -83,9 +105,15 @@ event DrawEditorSelection(Canvas c) {
   if (hudOverlayInstance != none && hudOverlayInstance.class != HUDOverlay) hudOverlayInstance = none;
   if (hudOverlayInstance == none) hudOverlayInstance = new (self, '', RF_Transient) HUDOverlay;
   hudOverlayInstance.drawUeaOverlay(c, 1.0, self, fRand());
+
+  if (bUseBox) {
+    c.drawBox(UseColor, 2, getTarget().location + UseOffset + UseBoxOffset + UseBoxDimensions / 2, getTarget().location + UseOffset + UseBoxOffset - UseBoxDimensions / 2);
+  }
 }
 
 defaultproperties {
+  bUseBox=false
+  UseBoxDimensions=(x=64,y=64,z=64)
   bCollideActors=true
   bEnabled=true
   bDisableAfterUse=false
