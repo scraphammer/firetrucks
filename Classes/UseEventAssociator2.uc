@@ -49,7 +49,7 @@ simulated function Actor getTarget() {
 
 simulated function float angleBetween(PlayerPawn p) {
   local vector v, d;
-  d = getTarget().location - p.location;
+  d = getTarget().location - p.CalcCameraLocation;
   v = vector(p.viewRotation);
   return acos((d dot v) / (vSize(d) * vSize(v)));
 }
@@ -88,6 +88,7 @@ simulated function float getFitness(PlayerPawn playerPawn) {
   if (bUseBox) {
     v = playerPawn.location - getTarget().location - UseOffset - UseBoxOffset;
     f = vSize(v);
+    f = f / max(UseBoxDimensions.x, max(UseBoxDimensions.y, UseBoxDimensions.z));
     if (!isPointInsideBox(playerPawn.location, getTarget().location + UseOffset + UseBoxOffset, UseBoxDimensions)) return -1;
   } else {
     v = playerPawn.location - getTarget().location - UseOffset;
@@ -98,7 +99,7 @@ simulated function float getFitness(PlayerPawn playerPawn) {
   }
   angle = angleBetween(playerPawn);
   if (angle > PI/2) return -1;
-  return f * (PI/2 - angle);
+  return (PI/2 - angle)**(1.0-f);
 }
 
 event DrawEditorSelection(Canvas c) {
