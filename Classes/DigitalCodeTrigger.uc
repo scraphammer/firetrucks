@@ -54,7 +54,6 @@ function initialize() {
   local DCT_Digit digit;
   if (initialized) return;
   foreach Digits(digit) {
-    log("spawning dummy for digit="$digit.digit$" if digit event is not blank?"@(digit.DigitEvent NotBlank));
     if (digit.DigitEvent NotBlank) spawn(class'MultiInputTriggerDummy', self, digit.DigitEvent,,); 
   }
   spawn(class'MultiInputTriggerDummy', self, ResetEvent,,);
@@ -99,8 +98,6 @@ function submit(actor Other, pawn EventInstigator) {
   local String codeToUse;
 
   codeTouse = getCodeToUse(other, EventInstigator);
-  
-  log("Sumission time! code entered:"@buffer@" codeToUse:"@codeToUse);
 
   if (buffer == codeToUse) {
     if (bDisableAfterSuccess) bEnabled = false;
@@ -121,7 +118,6 @@ function string getCodeToUse(actor Other, pawn EventInstigator) {
 
   if (KvStoreReadKey NotBlank) {
     kvsClass = class<Inventory>(DynamicLoadObject(kvStoreClassName, class'Class'));
-    log("KvStoreReadKey is not blank, looking for kvs"@KvStoreReadKey);
     inventory = EventInstigator.inventory;
     while (inventory != none) {
       if (inventory.class == kvsClass) {
@@ -181,7 +177,6 @@ function DummyCallback(Actor other, Pawn EventInstigator, name eventThatFired) {
   foreach Digits(digit) {
     if (digit.DigitEvent NotBlank && digit.DigitEvent == eventThatFired) {
       buffer $= left(digit.digit, 1);
-      log("event was a digit, new buffer is"@buffer);
       writeBufferToKvs(other, eventInstigator);
     }
   }

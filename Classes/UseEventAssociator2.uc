@@ -71,13 +71,14 @@ static function UseEventAssociator2 getBestFit(PlayerPawn playerPawn) {
   else return none;
 }
 
-simulated static function bool isPointInsideBox(vector point, vector boxCenter, vector boxDimensions) {
-  if (point.x > boxCenter.x + boxDimensions.x / 2) return false;
-  if (point.x < boxCenter.x - boxDimensions.x / 2) return false;
-  if (point.y > boxCenter.y + boxDimensions.y / 2) return false;
-  if (point.y < boxCenter.y - boxDimensions.y / 2) return false;
-  if (point.z > boxCenter.z + boxDimensions.z / 2) return false;
-  if (point.z < boxCenter.z - boxDimensions.z / 2) return false;
+simulated static function bool isPointInsideBox(vector point, vector boxCenter, vector boxDimensions, rotator rotatr) {
+  point = (point - boxcenter << rotatr);
+  if (point.x > boxDimensions.x / 2) return false;
+  if (point.x < -boxDimensions.x / 2) return false;
+  if (point.y > boxDimensions.y / 2) return false;
+  if (point.y < -boxDimensions.y / 2) return false;
+  if (point.z > boxDimensions.z / 2) return false;
+  if (point.z < -boxDimensions.z / 2) return false;
   return true;
 }
 
@@ -86,10 +87,11 @@ simulated function float getFitness(PlayerPawn playerPawn) {
   local float f, angle;
   if (!bEnabled) return -1;
   if (bUseBox) {
-    v = playerPawn.location - getTarget().location - UseOffset - UseBoxOffset;
+    v = playerPawn.location - getTarget().location - UseOffset - (UseBoxOffset >> rotation);
     f = vSize(v);
     f = f / max(UseBoxDimensions.x, max(UseBoxDimensions.y, UseBoxDimensions.z));
-    if (!isPointInsideBox(playerPawn.location, getTarget().location + UseOffset + UseBoxOffset, UseBoxDimensions)) return -1;
+    // FIXME what
+    if (!isPointInsideBox(playerPawn.location, getTarget().location + UseOffset + (UseBoxOffset >> rotation), UseBoxDimensions, rotation)) return -1;
   } else {
     v = playerPawn.location - getTarget().location - UseOffset;
     f = vSize(v);
@@ -108,7 +110,10 @@ event DrawEditorSelection(Canvas c) {
   hudOverlayInstance.drawUeaOverlay(c, 1.0, self, fRand());
 
   if (bUseBox) {
-    c.drawBox(UseColor, 2, getTarget().location + UseOffset + UseBoxOffset + UseBoxDimensions / 2, getTarget().location + UseOffset + UseBoxOffset - UseBoxDimensions / 2);
+    c.drawColor = UseColor;
+    class'PulsingBoxUEAHUDOverlay'.static.drawBox(c, getTarget().location + UseOffset + (UseBoxOffset >> rotation), UseBoxDimensions.x / 2 , UseBoxDimensions.y / 2, UseBoxDimensions.z / 2, 8, rotation);
+    c.setPos(16,16);
+    class'FiretrucksHUD'.static.drawTextWithShadow(c, "is camera inside box?"@isPointInsideBox(c.GetCameraCoords().Origin, getTarget().location + UseOffset + UseBoxOffset, UseBoxDimensions, rotation),, true);
   }
 }
 
