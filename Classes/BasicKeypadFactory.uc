@@ -67,10 +67,10 @@ function SpecialEvent makeSpecialEvent(name tagToUse, Sound sound, vector baseLo
   return specialEvent;
 }
 
-function StaticMeshActor makeStaticMesh(vector scale3D, vector offset) {
+function StaticMeshActor makeStaticMesh(vector scale3D, vector offset, optional rotator extraRotation) {
   local StaticMeshActor staticMeshActor;
   staticMeshActor = spawn(Class'StaticMeshActor',,, location + getRotOffset(MakeOffset + offset));
-  staticMeshActor.SetRotation(rotation);
+  staticMeshActor.SetRotation(rotation + extraRotation);
   staticMeshActor.DrawScale3D = scale3D;
   staticMeshActor.bShadowCast = false;
   staticMeshActor.mesh = LodMesh'DiceM';
@@ -93,7 +93,7 @@ function onPropertyChange(name property, name parentProperty) {
   local DigitalCodeTrigger digitalCodeTrigger;
   local SpecialEvent specialEvent;
   local ScriptedTexture ScriptedTexture;
-  //local KeypadScriptedTextureNotifier keypadScriptedTextureNotifier;
+  local KeypadScriptedTextureNotifier keypadScriptedTextureNotifier;
 	if (Property == 'MakeButton') {
     if (TagPrefix == "") nameToUse = name $ "_" $ counter $ "_";
     else nameToUse = TagPrefix;
@@ -187,6 +187,11 @@ function onPropertyChange(name property, name parentProperty) {
     specialEvent = makeSpecialEvent(digitalCodeTrigger.failEvent, Sound'ebdKeypadFail', staticMeshActor.location, eventOffset * 2);
     
     //screen
+    keypadScriptedTextureNotifier = spawn(Class'KeypadScriptedTextureNotifier',,, location + getRotOffset(MakeOffset + Vect(128,32,0)));
+    keypadScriptedTextureNotifier.digitalCodeTrigger = digitalCodeTrigger;
+    staticMeshActor = makeStaticMesh(screenScale3d, screenOffset, screenRotation);
+    staticMeshActor.mesh = LodMesh'FlatSheet';
+    staticMeshActor.multiskins[0] = none;
   }
 }
 
@@ -211,7 +216,7 @@ defaultproperties {
   buttonScale3d=(x=2,y=1,z=2)
   screenOffset=(x=0,y=-5,z=18)
   screenScale3d=(x=0.05,y=0.125,z=1)
-  screenRotation=(pitch=270,roll=0,yaw=-90)
+  screenRotation=(pitch=49151,roll=0,yaw=-16383)
   UseBoxDimensions=(x=128,y=128,z=160)
   UseBoxOffset=(x=0,y=-96,z=0)
   code="0451"

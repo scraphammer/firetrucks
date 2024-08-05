@@ -90,7 +90,6 @@ simulated function float getFitness(PlayerPawn playerPawn) {
     v = playerPawn.location - getTarget().location - UseOffset - (UseBoxOffset >> rotation);
     f = vSize(v);
     f = f / max(UseBoxDimensions.x, max(UseBoxDimensions.y, UseBoxDimensions.z));
-    // FIXME what
     if (!isPointInsideBox(playerPawn.location, getTarget().location + UseOffset + (UseBoxOffset >> rotation), UseBoxDimensions, rotation)) return -1;
   } else {
     v = playerPawn.location - getTarget().location - UseOffset;
@@ -113,7 +112,7 @@ event DrawEditorSelection(Canvas c) {
     c.drawColor = UseColor;
     class'PulsingBoxUEAHUDOverlay'.static.drawBox(c, getTarget().location + UseOffset + (UseBoxOffset >> rotation), UseBoxDimensions.x / 2 , UseBoxDimensions.y / 2, UseBoxDimensions.z / 2, 8, rotation);
     c.setPos(16,16);
-    class'FiretrucksHUD'.static.drawTextWithShadow(c, "is camera inside box?"@isPointInsideBox(c.GetCameraCoords().Origin, getTarget().location + UseOffset + UseBoxOffset, UseBoxDimensions, rotation),, true);
+    class'FiretrucksHUD'.static.drawTextWithShadow(c, "is camera inside box?"@isPointInsideBox(c.GetCameraCoords().Origin, getTarget().location + UseOffset + (UseBoxOffset >> rotation), UseBoxDimensions, rotation),, true);
   }
 }
 
