@@ -6,7 +6,8 @@ event RenderTexture(ScriptedTexture s) {
 
   if (digitalCodeTrigger == none) return;
 
-  s.DrawText(0,0,digitalCodeTrigger.buffer,Font'WeedrowFont');
+  if (digitalCodeTrigger.buffer != "") s.DrawText(0,0,digitalCodeTrigger.buffer,Font'WeedrowFont');
+  else s.DrawText(0,0,">",Font'WeedrowFont');
 }
 
 defaultproperties {

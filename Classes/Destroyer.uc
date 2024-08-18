@@ -23,6 +23,10 @@ function Trigger(actor Other, pawn EventInstigator) {
   local Actor a;
   switch(targetType) {
     case TT_TAG:
+      if (targetTag == '') {
+        warn("improperly configured Destroyer actor:"@self);
+        break;
+      }
       foreach allactors(class'Actor', a, targetTag) destroyerMain(a);
       break;
     case TT_TARGET:
