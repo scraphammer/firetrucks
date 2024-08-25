@@ -92,7 +92,7 @@ function onPropertyChange(name property, name parentProperty) {
   local UseEventAssociator2 uea2;
   local DigitalCodeTrigger digitalCodeTrigger;
   local SpecialEvent specialEvent;
-  local ScriptedTexture ScriptedTexture;
+  //local ScriptedTexture ScriptedTexture;
   local KeypadScriptedTextureNotifier keypadScriptedTextureNotifier;
 	if (Property == 'MakeButton') {
     if (TagPrefix == "") nameToUse = name $ "_" $ counter $ "_";
