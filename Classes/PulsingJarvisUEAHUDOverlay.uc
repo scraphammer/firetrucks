@@ -39,7 +39,7 @@ static final function vector averageVector(out array<vector> a, int length) {
   return makeVector(sumX/length,sumY/length,sumZ/length);
 }
 
-static final function int getVertsOfActorMesh(out array<vector> rawPoints, Actor a) {
+static final function int getVertsOfActorMesh(out Array<vector> rawPoints, Actor a) {
   a.allFrameVerts(rawPoints);
   return a.getVertexCount();
 }
@@ -48,7 +48,7 @@ static final function bool isLeft(vector p, vector a, vector b) {
   return ((a.y - p.y) * (b.x - a.x) - (a.x - p.x) * (b.y - a.y)) < 0;
 }
 
-static final function int jarvis(out array<vector> points, out array<Line> lines, int length) { // length = length of points
+static final function int jarvis(out Array<vector> points, out Array<Line> lines, int length) { // length = length of points
   local int i, j;
   local vector current, next;
   // shamelessly borrowed from wikipedia
@@ -71,9 +71,24 @@ static final function int jarvis(out array<vector> points, out array<Line> lines
   return i;
 }
 
+static final function Array<vector> validate(Canvas canvas, Array<vector> points, out int pointCount) {
+  local int validCount;
+  local int i;
+  local Array<Vector> validPoints;
+  validCount = 0;
+  for (i = 0; i < pointCount; i++) {
+    if (points[i].x < canvas.clipx && points[i].x > 0 &&
+        points[i].y < canvas.clipy && points[i].y > 0) {
+      validPoints[validCount++] = points[i];
+    }
+  }
+  pointCount = validCount;
+  return validPoints;
+}
+
 simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator2 UseEventAssociator2, optional float overrideAnimAlpha) {
   local Array<vector> points;
-  local array<vector> chomped;
+  local Array<vector> chomped;
   local Array<Line> lines;
   local vector average;
   local float alpha;
@@ -107,6 +122,8 @@ simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator
   for (i = 0; i < pointCount; i++) {
     chomped[i] = chomp(canvas.worldToScreen(points[i] + UseEventAssociator2.UseOffset, z));
   }
+
+  chomped = validate(canvas, chomped, pointCount);
 
   average = averageVector(chomped, pointCount);
 
