@@ -61,26 +61,47 @@ function Trigger(actor Other, pawn EventInstigator) {
 
   switch(checkType) {
     case CT_YES:
-      if (count > 0) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count > 0) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_NO:
-      if (count == 0) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count == 0) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_GREATER:
-      if (count > quantity) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count > quantity) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_GREATEREQUAL:
-      if (count >= quantity) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count >= quantity) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_EQUAL:
-      if (count == quantity) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count == quantity) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_LESSEQUAL:
-      if (count <= quantity) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count <= quantity) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
     case CT_LESS:
-      if (count < quantity) triggerEvent(event, other, eventInstigator);
-      return;
+      if (count < quantity) {
+        triggerEvent(event, other, eventInstigator);
+        return;
+      }
+      break;
   }
   if (eventOnFail != '') triggerEvent(eventOnFail, other, eventInstigator);
 }
