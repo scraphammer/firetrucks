@@ -31,7 +31,7 @@ function Trigger(actor Other, pawn EventInstigator) {
             if (bInstigatorOnly && PlayerPawn(EventInstigator) != none) {
                 inv = Spawn(prototype);
                 if (count > 0 && Pickup(inv) != none && Pickup(inv).bCanHaveMultipleCopies) Pickup(inv).numCopies = count - 1;
-                inv.touch(p);
+                inv.touch(EventInstigator);
             } else {
                 foreach allactors(class'PlayerPawn', p) {
                     inv = Spawn(prototype);
