@@ -92,11 +92,11 @@ simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator
 
 
   canvas.drawColor = UseEventAssociator2.UseColor / 2;
-  draw2dBox(canvas, average, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
+  Class'Pulsing2dBoxUeaHudOverlay'.static.draw2dBox(canvas, average, width + animScalar * edgeSpacing * sin(2 * PI * alpha),
                                                 depth + animScalar * edgeSpacing * sin(2 * PI * alpha),
                                                 edgeSpacing * 2, hudScale2d);
   canvas.drawColor = UseEventAssociator2.UseColor;
-  draw2dBox(canvas, average, width, depth, edgeSpacing * 2, hudScale2d);
+  Class'Pulsing2dBoxUeaHudOverlay'.static.draw2dBox(canvas, average, width, depth, edgeSpacing * 2, hudScale2d);
 
   canvas.style = 1;
   canvas.font = useFont;
@@ -118,7 +118,7 @@ simulated event drawUeaOverlay(Canvas canvas, float hudScale, UseEventAssociator
   }
 }
 
-static simulated function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU, float hudScale2d) {
+static function draw2dBox(Canvas canvas, vector center, float x, float y, float cornerSizeUU, float hudScale2d) {
   canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2 + cornerSizeUU, -y/2, 0)) * hudScale2d * hudScale2d);
   canvas.draw2DLine(canvas.drawColor, (center + makeVector(-x/2, -y/2, 0)) * hudScale2d * hudScale2d, (center + makeVector(-x/2, -y/2 + cornerSizeUU, 0)) * hudScale2d * hudScale2d);
 

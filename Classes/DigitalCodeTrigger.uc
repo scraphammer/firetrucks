@@ -42,6 +42,11 @@ var bool initialized;
 var ASMD asmd;
 var string kvStoreClassName;
 
+replication {
+  reliable if (Role == ROLE_Authority)
+    buffer;
+}
+
 static final postoperator bool NotBlank (name n) {
   return n != '';
 }
@@ -196,4 +201,5 @@ defaultproperties {
   Texture=Texture'i_digitalCodeTrigger'
   kvStoreClassName="KvStore.KvStore"
   KvStoreReadScope=CS_GLOBAL;
+  bNoDelete=true
 }

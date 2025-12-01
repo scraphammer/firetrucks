@@ -26,7 +26,7 @@ var UseEventAssociatorTargetDummy dummy;
 
 replication {
   reliable if (Role == ROLE_Authority)
-    getFitness, angleBetween, getBestFit, getTarget;
+    getFitness, angleBetween, getBestFit, getTarget, bEnabled;
 }
 
 
