@@ -10,6 +10,10 @@ replication {
 
 var() Class<UseEventAssociator2HUDOverlay> hudOverlay;
 
+function TravelPreAccept(){
+    Destroy();
+} 
+
 function touch(Actor other) {
   super.touch(other);
   giveToMyOwner();
